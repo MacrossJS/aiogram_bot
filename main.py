@@ -1,21 +1,18 @@
-import os
 import random
 from datetime import datetime
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Text, Command
-import dotenv
+from config_data.config import Configs
 
+config = Configs()
 
-dotenv.load_dotenv()
+print(config)
 
-# Вместо BOT TOKEN HERE нужно вставить токен вашего бота, полученный у @BotFather
-API_TOKEN: str = os.getenv('TG_TOKEN')
-admin_ids: int = int(os.getenv('TG_ADMIN_ID'))
-print(admin_ids)
+print(config.tg_bot.admin_ids)
 # Создаем объекты бота и диспетчера
-bot: Bot = Bot(token=API_TOKEN)
+bot: Bot = Bot(token=config.tg_bot.token)
 dp: Dispatcher = Dispatcher()
 
 # Количество попыток, доступных пользователю в игре

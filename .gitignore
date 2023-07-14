@@ -1,4 +1,6 @@
-__pycache__
-/venv
-/.idea
+__pycache__/
+venv/
+.idea/
+.mypy_cache/
 .env
+desktop.ini
