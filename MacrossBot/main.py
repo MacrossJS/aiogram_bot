@@ -4,7 +4,7 @@ from datetime import datetime
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Text, Command
-from config_data.config import Configs
+from config_data.config_example import Configs
 
 config = Configs()
 
