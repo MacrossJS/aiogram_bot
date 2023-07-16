@@ -3,6 +3,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram import F
 
 from config_data.config import Config, load_config
+from lexicon.lexicon_ru import LEXICON_RU
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType, Message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
@@ -19,13 +20,13 @@ kb_builder: ReplyKeyboardBuilder = ReplyKeyboardBuilder()
 
 # Создаем кнопки
 contact_btn: KeyboardButton = KeyboardButton(
-    text='Отправить телефон',
+    text=LEXICON_RU['b_phone'],
     request_contact=True)
 geo_btn: KeyboardButton = KeyboardButton(
-    text='Отправить геолокацию',
+    text=LEXICON_RU['b_geo'],
     request_location=True)
 poll_btn: KeyboardButton = KeyboardButton(
-    text='Создать опрос/викторину',
+    text=LEXICON_RU['b_geo'],
     request_poll=KeyboardButtonPollType())
 
 # Создаем кнопку
@@ -82,7 +83,7 @@ async def process_contact_share(message: Message):
 # Этот хэндлер будет срабатывать запуск приложения
 @dp.message(F.web_app_data)
 async def process_web_app_data(message: Message):
-    msg = f'{message.web_app_data.data}'
+    msg = f"{message.web_app_data.data}"
     print(message.web_app_data)
     await message.answer(text=msg)
 
