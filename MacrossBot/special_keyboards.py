@@ -26,7 +26,7 @@ geo_btn: KeyboardButton = KeyboardButton(
     text=LEXICON_RU['b_geo'],
     request_location=True)
 poll_btn: KeyboardButton = KeyboardButton(
-    text=LEXICON_RU['b_geo'],
+    text=LEXICON_RU['b_poll'],
     request_poll=KeyboardButtonPollType())
 
 # Создаем кнопку
