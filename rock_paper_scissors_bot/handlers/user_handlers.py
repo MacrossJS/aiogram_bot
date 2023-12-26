@@ -3,6 +3,7 @@ from aiogram.filters import Command, CommandStart, Text
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
 from rock_paper_scissors_bot.keyboards.keyboards import *
+from rock_paper_scissors_bot.keyboards.keyboard_builder import create_inline_kb
 from rock_paper_scissors_bot.lexicon.lexicon_ru import LEXICON_RU
 from rock_paper_scissors_bot.services.services import get_bot_choice, get_winner
 
@@ -18,7 +19,14 @@ async def process_start_command(message: Message):
 # Этот хэндлер срабатывает на команду /help
 @router.message(Command(commands=['help']))
 async def process_help_command(message: Message):
-    await message.answer(text=LEXICON_RU['/help'], reply_markup=yes_no_kb)
+    new_kb = create_inline_kb(3, 'Menu',
+                              go_exit='Назад',
+                              btn_tel='Телефон',
+                              btn_email='email',
+                              btn_website='Web-сайт',
+                              btn_vk='VK',
+                              btn_tgbot='Наш телеграм-бот')
+    await message.answer(text=LEXICON_RU['/help'], reply_markup=new_kb)
 
 
 # Этот хэндлер срабатывает на согласие пользователя играть в игру
@@ -59,8 +67,20 @@ async def process_callback_answer(message: Message):
 
 
 # Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
-# с data 'big_button_1_pressed' или 'big_button_2_pressed'
-@router.callback_query(Text(text=['big_button_1_pressed',
-                                  'big_button_2_pressed']))
-async def process_buttons_press(callback: CallbackQuery):
-    await callback.answer()
+# с data 'big_button_1_pressed'
+@router.callback_query(Text(text=['big_button_1_pressed']))
+async def process_button_1_press(callback: CallbackQuery):
+    if callback.message.text != 'Была нажата БОЛЬШАЯ КНОПКА 1':
+        await callback.message.edit_text(
+            text='Была нажата БОЛЬШАЯ КНОПКА 1',
+            reply_markup=callback.message.reply_markup)
+    await callback.answer(text='Ура! Нажата кнопка 1', show_alert=True)
+
+
+# Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
+# с data 'big_button_2_pressed'
+@router.callback_query(Text(text=['big_button_2_pressed']))
+async def process_button_2_press(callback: CallbackQuery):
+    await callback.message.edit_text(
+        text='Была нажата БОЛЬШАЯ КНОПКА 2',
+        reply_markup=callback.message.reply_markup)
