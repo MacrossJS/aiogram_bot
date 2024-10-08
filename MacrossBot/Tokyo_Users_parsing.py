@@ -24,7 +24,8 @@ def collection_profiles(idx):
             continue
         json_data['public_id'] = idx
         fake_ua = {'User-Agent': ua.random}
-        response = requests.post('https://api.3ze.ru:5489/users', headers=fake_ua, json=json_data, verify="cert.cer")
+        response = requests.post('https://api.ntg.bz:5489/users', headers=fake_ua, json=json_data,
+                                 verify='ntg-bz-chain.pem')
         response.encoding = 'utf-8'
         user = json.loads(response.text)
         if user['status'] != "user_info":
@@ -36,6 +37,7 @@ def collection_profiles(idx):
         users[idx]["level"] = user["user_level"]
         users[idx]["exp"] = user["user_xp"]
         users[idx]["wins"] = user["wins"]
+        users[idx]["defeat"] = user["defeat"]
         # Статы
         users[idx]["speed"] = user["speed"]
         users[idx]["strength"] = user["strength"]
@@ -48,21 +50,25 @@ def collection_profiles(idx):
         # Репутация
         users[idx]["rep_Mars"] = user["rep_Mars"]
         users[idx]["rep_NT"] = user["rep_NT"]
-        users[idx]["sum_rep"] = user["rep_Mars"] + user["rep_NT"]
+        users[idx]["rep_Venera"] = user["rep_Venera"]
+        users[idx]["sum_rep"] = user["rep_Mars"] + user["rep_NT"] + user["rep_Venera"]
+        # Достижения
+        users[idx]["achievements"] = user["achievements"]
+        users[idx]["point_guardian"] = user["point_guardian"]
         idx += 1
-        time.sleep(0.5)
+        time.sleep(0.4)
 
 
 def save_info():
     """Сохраним в json-файл"""
-    with open(f"logs/Tokyo-Users_{datetime.today().strftime('%Y.%m.%d')}.json", 'w') as save:
+    with open(f"logs_tokyo/Tokyo-Users_{datetime.today().strftime('%Y.%m.%d')}.json", 'w') as save:
         json.dump(users, save, indent=4)  # , ensure_ascii=False)
     print(f"Всего игроков: {len(users)}")
 
 
 print("Прасинг активирован!")
 while True:
-    if datetime.now().strftime('%H:%M') == '23:45':
+    if datetime.now().strftime('%H:%M') in ('11:52', '17:52', '23:48'):
         print(f"Начало сбора информации: {datetime.today().strftime('%Y.%m.%d в %H:%M:%S')}")
         collection_profiles(idx=1)
         print(f"Сбор завершен: {datetime.today().strftime('%Y.%m.%d в %H:%M:%S')}")

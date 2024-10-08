@@ -6,7 +6,7 @@ from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message, PhotoSize)
-from book_bot.config_data.config import Config, load_config
+from fsm.config_data.config import Config, load_config
 
 # Загружаем конфиг в переменную config
 config: Config = load_config()
@@ -81,6 +81,7 @@ async def process_fillform_command(message: Message, state: FSMContext):
 @dp.message(StateFilter(FSMFillForm.fill_name), F.text.isalpha())
 async def process_name_sent(message: Message, state: FSMContext):
     # Сохраняем введенное имя в хранилище по ключу "name"
+    print(message.text)
     await state.update_data(name=message.text)
     await message.answer(text='Спасибо!\n\nА теперь введите ваш возраст')
     # Устанавливаем состояние ожидания ввода возраста
@@ -103,6 +104,7 @@ async def warning_not_name(message: Message):
             lambda x: x.text.isdigit() and 4 <= int(x.text) <= 120)
 async def process_age_sent(message: Message, state: FSMContext):
     # Сохраняем возраст в хранилище по ключу "age"
+    print(message.text)
     await state.update_data(age=message.text)
     # Создаем объекты инлайн-кнопок
     male_button = InlineKeyboardButton(text='Мужской ♂',
@@ -127,6 +129,7 @@ async def process_age_sent(message: Message, state: FSMContext):
 # будет введено что-то некорректное
 @dp.message(StateFilter(FSMFillForm.fill_age))
 async def warning_not_age(message: Message):
+    print(message.text)
     await message.answer(
         text='Возраст должен быть целым числом от 4 до 120\n\n'
              'Попробуйте еще раз\n\nЕсли вы хотите прервать '
@@ -140,6 +143,7 @@ async def warning_not_age(message: Message):
 async def process_gender_press(callback: CallbackQuery, state: FSMContext):
     # Cохраняем пол (callback.data нажатой кнопки) в хранилище,
     # по ключу "gender"
+    print(callback.data)
     await state.update_data(gender=callback.data)
     # Удаляем сообщение с кнопками, потому что следующий этап - загрузка фото
     # чтобы у пользователя не было желания тыкать кнопки
@@ -168,6 +172,7 @@ async def process_photo_sent(message: Message,
                              largest_photo: PhotoSize):
     # Cохраняем данные фото (file_unique_id и file_id) в хранилище
     # по ключам "photo_unique_id" и "photo_id"
+    print(largest_photo.file_unique_id)
     await state.update_data(photo_unique_id=largest_photo.file_unique_id,
                             photo_id=largest_photo.file_id)
     # Создаем объекты инлайн-кнопок

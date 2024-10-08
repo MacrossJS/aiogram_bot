@@ -1,0 +1,86 @@
+{
+    "2685": {
+        "name": "13th",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 107457,
+        "rating": 723,
+        "position": 4
+    },
+    "3141": {
+        "name": "Macross",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 70544,
+        "rating": 434,
+        "position": 20
+    },
+    "2760": {
+        "name": "fakeplaya",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 22764,
+        "rating": 461,
+        "position": 18
+    },
+    "2885": {
+        "name": "\u0411\u0430\u043d\u0442\u0438\u043a",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 25378,
+        "rating": 310,
+        "position": 52
+    },
+    "3468": {
+        "name": "\u0410\u043b\u0438\u043d\u0430",
+        "class": "\ud83d\udee1\ufe0f \u0417\u0430\u0449\u0438\u0442\u043d\u0438\u043a \u043b\u0435\u0441\u0430",
+        "exp": 21252,
+        "rating": 329,
+        "position": 45
+    },
+    "5033": {
+        "name": "LeafSong",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 11103,
+        "rating": 230,
+        "position": 88
+    },
+    "2271": {
+        "name": "Strelitzia",
+        "class": "\ud83d\udee1\ufe0f \u0417\u0430\u0449\u0438\u0442\u043d\u0438\u043a \u043b\u0435\u0441\u0430",
+        "exp": 4841,
+        "rating": 316,
+        "position": 50
+    },
+    "2237": {
+        "name": "Miashas",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 3824,
+        "rating": 116,
+        "position": 167
+    },
+    "5551": {
+        "name": "\u041d\u0430\u0437\u0433\u0443\u043b",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 14963,
+        "rating": 0,
+        "position": 622
+    },
+    "5494": {
+        "name": "Reneon",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 3391,
+        "rating": 0,
+        "position": 622
+    },
+    "5036": {
+        "name": "HeyDzha",
+        "class": "\ud83d\udee1\ufe0f \u0417\u0430\u0449\u0438\u0442\u043d\u0438\u043a \u043b\u0435\u0441\u0430",
+        "exp": 2139,
+        "rating": 10,
+        "position": 475
+    },
+    "5585": {
+        "name": "\u041f\u0441\u0438\u0445\u043e\u043b\u043e\u043338",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 1060,
+        "rating": 10,
+        "position": 473
+    }
+}

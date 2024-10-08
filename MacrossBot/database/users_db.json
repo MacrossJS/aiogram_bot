@@ -1,0 +1,95 @@
+{
+    "784724803": {
+        "tokyo_id": 371,
+        "forest_id": 3141,
+        "game_name": "Macross",
+        "forest_class": null,
+        "visible": true,
+        "icon": "🤖"
+    },
+    "171429474": {
+        "tokyo_id": 622,
+        "forest_id": 3468,
+        "game_name": "Алина",
+        "forest_class": null,
+        "visible": true,
+        "icon": "🍷"
+    },
+    "5722946366": {
+        "tokyo_id": 387,
+        "forest_id": 0,
+        "game_name": "РАЙН",
+        "forest_class": null,
+        "visible": true,
+        "icon": "🐈"
+    },
+    "1692082781": {
+        "tokyo_id": 567,
+        "forest_id": 0,
+        "game_name": "Мелман",
+        "forest_class": null,
+        "visible": true,
+        "icon": "🚨"
+    },
+    "912638206": {
+        "tokyo_id": 573,
+        "forest_id": 0,
+        "game_name": "Путник",
+        "forest_class": null,
+        "visible": true,
+        "icon": "😎"
+    },
+    "1660983940": {
+        "tokyo_id": 423,
+        "forest_id": 3402,
+        "game_name": "Хъёрвард",
+        "forest_class": "night_hunter",
+        "visible": true,
+        "icon": "🚨"
+    },
+    "854650084": {
+        "tokyo_id": 134,
+        "forest_id": 3141,
+        "game_name": "Психолог38",
+        "forest_class": null,
+        "visible": true,
+        "icon": "🔱"
+    },
+    "2064670864": {
+        "tokyo_id": 422,
+        "forest_id": 5551,
+        "game_name": "Hazgull",
+        "forest_class": null,
+        "visible": true,
+        "icon": "➡"
+    },
+    "411575586": {
+        "tokyo_id": 0,
+        "forest_id": 5033,
+        "game_name": "LeafSong",
+        "forest_class": null,
+        "visible": true,
+        "icon": "👸"
+    },
+    "6790006901": {
+        "tokyo_id": 0,
+        "forest_id": 2885,
+        "game_name": "Бантик",
+        "forest_class": null,
+        "visible": true,
+        "icon": "👸"
+    },
+    "5040538204": {
+        "tokyo_id": 0,
+        "forest_id": 0,
+        "game_name": "13th",
+        "forest_class": null,
+        "visible": true,
+        "icon": "🌚"
+    },
+    "406700420": {
+        "game_name": "Mikhail",
+        "forest_class": "night_hunter",
+        "icon": "🗡"
+    }
+}

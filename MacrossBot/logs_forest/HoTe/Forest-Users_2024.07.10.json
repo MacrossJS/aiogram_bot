@@ -1,0 +1,72 @@
+{
+    "5515": {
+        "name": "\u041a\u0438\u043c\u0438",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 1198,
+        "rating": 0,
+        "position": 633
+    },
+    "5553": {
+        "name": "PlushSamurai",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 8494,
+        "rating": 50,
+        "position": 306
+    },
+    "5588": {
+        "name": "FlawRiver",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 5834,
+        "rating": 49,
+        "position": 308
+    },
+    "5632": {
+        "name": "\u041d\u0430\u0435\u043c\u043d\u0438\u043a",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 2590,
+        "rating": 0,
+        "position": 633
+    },
+    "5571": {
+        "name": "WerysDream",
+        "class": "\ud83d\udee1\ufe0f \u0417\u0430\u0449\u0438\u0442\u043d\u0438\u043a \u043b\u0435\u0441\u0430",
+        "exp": 2199,
+        "rating": 48,
+        "position": 315
+    },
+    "5516": {
+        "name": "\u0421\u043e\u043b\u0435\u043d\u044b\u0439",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 963,
+        "rating": 10,
+        "position": 486
+    },
+    "5517": {
+        "name": "\u0425\u043e\u0437\u044f\u0438\u043d",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 1695,
+        "rating": 0,
+        "position": 633
+    },
+    "5586": {
+        "name": "Runni",
+        "class": "\ud83d\udde1 \u041d\u043e\u0447\u043d\u043e\u0439 \u043e\u0445\u043e\u0442\u043d\u0438\u043a",
+        "exp": 296,
+        "rating": 0,
+        "position": 633
+    },
+    "5589": {
+        "name": "Nika",
+        "class": "\ud83d\udee1\ufe0f \u0417\u0430\u0449\u0438\u0442\u043d\u0438\u043a \u043b\u0435\u0441\u0430",
+        "exp": 2200,
+        "rating": 0,
+        "position": 633
+    },
+    "5719": {
+        "name": "\u0420\u0435\u043f\u0442\u0438\u043b\u043e\u0438\u0434",
+        "class": "\u2694\ufe0f \u041c\u0430\u0441\u0442\u0435\u0440 \u043a\u043b\u0438\u043d\u043a\u0430",
+        "exp": 261,
+        "rating": 0,
+        "position": 633
+    }
+}

@@ -1,14 +1,28 @@
 import os
+from datetime import datetime
 
 from aiogram import Router, F, Bot
-from aiogram.types import Message
-from aiogram.filters import Command, CommandStart, Text
+from aiogram.types import Message, ChatMemberUpdated
+from aiogram.filters import Command, CommandStart, Text, ChatMemberUpdatedFilter, IS_NOT_MEMBER, IS_MEMBER
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from keyboards.keyboard_builder import create_reply_kb
 
 from lexicon.lexicon import *
 
 router: Router = Router()
+
+
+def time_now():
+    """Получим текущее время с учетом ОС"""
+    return datetime.today().strftime('%H:%M:%S')
+
+
+def log(user, log_text):
+    """Сформируем вывод красивого лога
+    цвет + текущее время + имя бота"""
+    color = 90 + user.id % 10
+    user_info = f"{user.first_name} {user.last_name if user.last_name else ''} | @{user.username} ({user.id})"
+    print(f"\033[{color}m{time_now()}: [{user_info}] --> {log_text}")
 
 
 @router.message(Command(commands='help'))
@@ -49,8 +63,19 @@ async def download_photo(message: Message, bot: Bot):
     await message.answer(f'Изображение {file_name} сохранено успешно!')
 
 
-# Этот хэндлер будет реагировать на любые сообщения пользователя,
-# не предусмотренные логикой работы бота
-@router.message()
-async def send_echo(message: Message):
-    await message.answer(f'{message.from_user.first_name}, бот не знает команду "{message.text}"')
+@router.message(F.location)
+async def handle_location(message: Message):
+    if message.location:
+        user = message.from_user
+        log(user, 'Запустил бота')
+        latitude = message.location.latitude
+        longitude = message.location.longitude
+        log(user, f"Координаты: {latitude}, {longitude}")
+        await message.reply(f"{message.from_user.first_name}, Ваши координаты: {latitude}, {longitude}")
+
+
+@router.chat_member(ChatMemberUpdatedFilter(IS_NOT_MEMBER >> IS_MEMBER))
+async def greet_new_member(message: Message, event: ChatMemberUpdated):
+    new_member = event.new_chat_member.user
+    if new_member:
+        await message.answer(f"Добро пожаловать, {new_member.first_name}!")
