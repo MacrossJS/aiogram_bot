@@ -2,8 +2,9 @@ import os
 from datetime import datetime
 
 from aiogram import Router, F, Bot
-from aiogram.types import Message, ChatMemberUpdated
-from aiogram.filters import Command, CommandStart, Text, ChatMemberUpdatedFilter, IS_NOT_MEMBER, IS_MEMBER
+from aiogram.exceptions import TelegramNetworkError
+from aiogram.types import ChatMemberUpdated
+from aiogram.filters import Command, ChatMemberUpdatedFilter, IS_NOT_MEMBER, IS_MEMBER
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from keyboards.keyboard_builder import create_reply_kb
 
@@ -17,21 +18,42 @@ def time_now():
     return datetime.today().strftime('%H:%M:%S')
 
 
-def log(user, log_text):
-    """Сформируем вывод красивого лога
-    цвет + текущее время + имя бота"""
-    color = 90 + user.id % 10
-    user_info = f"{user.first_name} {user.last_name if user.last_name else ''} | @{user.username} ({user.id})"
-    print(f"\033[{color}m{time_now()}: [{user_info}] --> {log_text}")
+def log(user: CallbackQuery | Message, log_text: str) -> None:
+    """Сформируем вывод красивого лога: цвет + текущее время + имя бота"""
+    color = 90 + user.from_user.id % 10
+    user_name = ''.join(filter(str.isalnum, user.from_user.first_name))
+    user_info = f"{user_name} {user.from_user.last_name or ''} | @{user.from_user.username or '-'} " \
+                f"({user.from_user.id})"
+    if isinstance(user, CallbackQuery):
+        chat = user.message.chat
+    else:
+        chat = user.chat
+
+    if chat.type == 'private':
+        print(f"\033[{color}m{time_now()}: [{user_info}] --> {log_text}\033[0m")
+    else:
+        chat_name = chat.title or "Чат"
+        print(f"\033[{color}m{time_now()}: [{chat_name}]>[{user_info}] --> {log_text}\033[0m")
 
 
 @router.message(Command(commands='help'))
 async def process_help_command(message: Message):
-    await message.answer(LEXICON['/help'], reply_markup=create_reply_kb())
+    try:
+        await message.answer(LEXICON['/help'], reply_markup=create_reply_kb())
+    except TelegramNetworkError as e:
+        log(message, f"Ошибка сети Telegram: {e.message}")
+
+    except Exception as e:
+        if str(e) == "Telegram server says Request timeout error":
+            log(message, f"Произошла ошибка: {str(e)}")
+        else:
+            log(message, f"Неопознананя ошибка: {e}")
 
 
 @router.message(F.content_type.in_({'photo', 'audio', 'voice', 'video', 'document'}))
 async def send_echo(message: Message):
+    if not message.chat.type == 'private':
+        return
     # print(message.json(indent=4, exclude_none=True))
     if message.photo:
         file_type, file_id, unique_id = "🖼 Изображение", message.photo[-1].file_id, message.photo[-1].file_unique_id
@@ -66,11 +88,10 @@ async def download_photo(message: Message, bot: Bot):
 @router.message(F.location)
 async def handle_location(message: Message):
     if message.location:
-        user = message.from_user
-        log(user, 'Запустил бота')
+        log(message, 'Запустил бота')
         latitude = message.location.latitude
         longitude = message.location.longitude
-        log(user, f"Координаты: {latitude}, {longitude}")
+        log(message, f"Координаты: {latitude}, {longitude}")
         await message.reply(f"{message.from_user.first_name}, Ваши координаты: {latitude}, {longitude}")
 
 

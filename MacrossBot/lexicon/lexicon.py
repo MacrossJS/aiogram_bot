@@ -27,5 +27,6 @@ LEXICON_COMMANDS: dict[str, str] = {
     '/clan_p2w': 'Статистика стаи P2W',
     '/admins': 'Руководство',
     '/help': 'О боте',
+    '/berries': 'Рецепты пирожков',
     '/start': 'В главное меню',
 }

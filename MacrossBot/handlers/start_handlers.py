@@ -3,6 +3,7 @@ import os
 import re
 from datetime import datetime
 from aiogram import Router, Bot
+from aiogram.exceptions import TelegramNetworkError
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, CallbackQuery
 from keyboards.keyboard_builder import create_inline_kb
@@ -22,7 +23,8 @@ def time_now() -> str:
 def log(user: CallbackQuery | Message, log_text: str) -> None:
     """Сформируем вывод красивого лога: цвет + текущее время + имя бота"""
     color = 90 + user.from_user.id % 10
-    user_info = f"{user.from_user.first_name} {user.from_user.last_name or ''} | @{user.from_user.username or '-'} " \
+    user_name = ''.join(filter(str.isalnum, user.from_user.first_name))
+    user_info = f"{user_name} {user.from_user.last_name or ''} | @{user.from_user.username or '-'} " \
                 f"({user.from_user.id})"
     if isinstance(user, CallbackQuery):
         chat = user.message.chat
@@ -49,17 +51,26 @@ def save_info(guild_tag: str, forest_users: dict) -> None:
 @router.message(CommandStart())
 async def process_start_command(message: Message):
     log(message, 'Запустил бота')
-    qwew = message.from_user.id
-    await message.answer(
-        text=LEXICON['/start'].format(message.from_user.first_name),
-        parse_mode="HTML",
-        reply_markup=create_inline_kb(
-            2, start_forest=MAIN_BTN['btn_start_forest'],
-            start_tokyo=MAIN_BTN['btn_start_tokyo']))
+    try:
+        await message.answer(
+            text=LEXICON['/start'].format(message.from_user.first_name),
+            parse_mode="HTML",
+            reply_markup=create_inline_kb(
+                2, start_forest=MAIN_BTN['btn_start_forest'],
+                start_tokyo=MAIN_BTN['btn_start_tokyo']))
+    except TelegramNetworkError as e:
+        log(message, f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        if str(e) == "Telegram server says Request timeout error":
+            log(message, f"Произошла ошибка: {str(e)}")
+        else:
+            log(message, f"Неопознананя ошибка: {e}")
 
 
 @router.message(lambda message: message.forward_date is not None)
 async def handle_forwarded_message(message: Message, bot: Bot):
+    if not message.chat.type == 'private':
+        return
     if message.forward_from.id != 6527978139:
         await message.answer(text='😎Принимается только пересланное сообщение из чата с ботом "Духи Леса"!')
         return
@@ -77,15 +88,31 @@ async def handle_forwarded_message(message: Message, bot: Bot):
         log(message, f'прислал данные стаи {clan_tag}')
         save_info(clan_tag, member_dict)
         buttun = {f"clan_{clan_tag}_2": f"Перейти к статистике {clan_tag}"}
-        await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-        await message.answer(text=f"✅Данные стаи {clan_tag} успешно сохранены.\n"
-                                  f"⚙️Для удаления данных своей стаи из бота свяжитесь с разработчиком --> "
-                                  f"<a href='tg://user?id=784724803'><b>Macross</b></a> / "
-                                  f"<a href='tg://user?id=1660983940'><b>Baka-Baka</b></a>",
-                             reply_markup=create_inline_kb(1, **buttun))
+        try:
+            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            await message.answer(text=f"✅Данные стаи {clan_tag} успешно сохранены.\n"
+                                      f"⚙️Для удаления данных своей стаи из бота свяжитесь с разработчиком --> "
+                                      f"<a href='tg://user?id=784724803'><b>Macross</b></a> / "
+                                      f"<a href='tg://user?id=1660983940'><b>Baka-Baka</b></a>",
+                                 reply_markup=create_inline_kb(1, **buttun))
+        except TelegramNetworkError as e:
+            log(message, f"Ошибка сети Telegram: {e.message}")
+        except Exception as e:
+            if str(e) == "Telegram server says Request timeout error":
+                log(message, f"Произошла ошибка: {str(e)}")
+            else:
+                log(message, f"Неопознананя ошибка: {e}")
     else:
         await message.answer(f"Пересланное вами сообщение не содержит данных о стае!")
-        await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        try:
+            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        except TelegramNetworkError as e:
+            log(message, f"Ошибка сети Telegram: {e.message}")
+        except Exception as e:
+            if str(e) == "Telegram server says Request timeout error":
+                log(message, f"Произошла ошибка: {str(e)}")
+            else:
+                log(message, f"Неопознананя ошибка: {e}")
 
 
 @router.message(Command(commands='admins'))

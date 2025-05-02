@@ -1,9 +1,11 @@
 import os
+import re
 from os.path import getctime
 import json
 from datetime import datetime
 
 from aiogram import Router
+from aiogram.exceptions import TelegramNetworkError
 from aiogram.filters import Command, Text
 from aiogram.types import CallbackQuery, Message
 from keyboards.keyboard_builder import create_inline_kb
@@ -12,6 +14,7 @@ from lexicon.lexicon_forest import *
 from services.forest_bosses import *
 from services.forest_keys import *
 from services.forest_alchemy import *
+from services.forest_berries import *
 
 router: Router = Router()
 
@@ -24,7 +27,8 @@ def time_now():
 def log(user: CallbackQuery | Message, log_text: str) -> None:
     """Сформируем вывод красивого лога: цвет + текущее время + имя бота"""
     color = 90 + user.from_user.id % 10
-    user_info = f"{user.from_user.first_name} {user.from_user.last_name or ''} | @{user.from_user.username or '-'} " \
+    user_name = ''.join(re.findall(r"[\w\s]+", user.from_user.first_name))
+    user_info = f"{user_name} {user.from_user.last_name or ''} | @{user.from_user.username or '-'} " \
                 f"({user.from_user.id})"
     if isinstance(user, CallbackQuery):
         chat = user.message.chat
@@ -83,34 +87,47 @@ async def process_start_command(callback: CallbackQuery):
     users_db = load_log_file("database/users_db.json")
     if str(callback.from_user.id) in users_db:
         user = f"{users_db[str(callback.from_user.id)]['icon']}{users_db[str(callback.from_user.id)]['game_name']}"
-    await callback.message.edit_text(
-        text=FOREST_LEXICON['start_forest'].format(user),
-        parse_mode="HTML",
-        reply_markup=create_inline_kb(
-            2, forest_bosses=FOREST_BTN['forest_bosses'],
-            forest_keys=FOREST_BTN['forest_keys'],
-            forest_commands=FOREST_BTN['forest_commands'],
-            forest_alchemy_1=FOREST_BTN['forest_alchemy'],
-            clan_statistic=FOREST_BTN['clan_statistic'],
-            calc_build_0=FOREST_BTN['calc_build'],
-        ))
+    try:
+        await callback.message.edit_text(
+            text=FOREST_LEXICON['start_forest'].format(user),
+            parse_mode="HTML",
+            reply_markup=create_inline_kb(
+                2, forest_bosses=FOREST_BTN['forest_bosses'],
+                forest_keys=FOREST_BTN['forest_keys'],
+                forest_commands=FOREST_BTN['forest_commands'],
+                forest_alchemy_1=FOREST_BTN['forest_alchemy'],
+                clan_statistic=FOREST_BTN['clan_statistic'],
+                calc_build_0=FOREST_BTN['calc_build'],
+            ))
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        print(f"Неопознананя ошибка: {e}")
 
 
 @router.callback_query(Text(text='clan_statistic'))
 async def forest_commands(callback: CallbackQuery):
     clan_list = get_clans_list()
     buttons = {f"clan_{name}_2": name for name in clan_list}
-    await callback.message.edit_text(
-        text="📈Для обновления данных по вашей стае или добавления ее в бота"
-             " перешлите сюда(в ЛС бота) сообщение из игры со списком участников стаи.\n\n"
-             f"⚙️Для удаления данных своей стаи из бота свяжитесь с разработчиком --> "
-             f"<a href='tg://user?id=784724803'><b>Macross</b></a> / "
-             f"<a href='tg://user?id=1660983940'><b>Baka-Baka</b></a>\n"
-        ,
-        parse_mode="HTML",
-        reply_markup=create_inline_kb(
-            2, go_exit="start_forest", **buttons,
-        ))
+    try:
+        await callback.message.edit_text(
+            text="📈Для обновления данных по вашей стае или добавления ее в бота"
+                 " перешлите сюда(в ЛС бота) сообщение из игры со списком участников стаи.\n\n"
+                 f"⚙️Для удаления данных своей стаи из бота свяжитесь с разработчиком --> "
+                 f"<a href='tg://user?id=784724803'><b>Macross</b></a> / "
+                 f"<a href='tg://user?id=1660983940'><b>Baka-Baka</b></a>\n"
+            ,
+            parse_mode="HTML",
+            reply_markup=create_inline_kb(
+                2, go_exit="start_forest", **buttons,
+            ))
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        if str(e) == "Telegram server says Request timeout error":
+            print(f"Произошла ошибка: {str(e)}")
+        else:
+            print(f"Неопознананя ошибка: {e}")
 
 
 @router.callback_query(Text(text='forest_commands'))
@@ -137,10 +154,15 @@ async def calc_build(callback: CallbackQuery):
         msg_text = f"{users_db[user_id]['game_name']}, ваш класс {FOREST_BTN[users_db[user_id]['forest_class']]}\n\n" \
                    f"⚙️Калькулятор находится в разработке, загляните позже."
         kb = create_inline_kb(1, go_exit="start_forest")
-    await callback.message.edit_text(
-        text=msg_text,
-        parse_mode="HTML",
-        reply_markup=kb)
+    try:
+        await callback.message.edit_text(
+            text=msg_text,
+            parse_mode="HTML",
+            reply_markup=kb)
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        print(f"Неопознананя ошибка: {e}")
 
 
 @router.callback_query(Text(text=['blade_master', 'forest_protector', 'night_hunter']))
@@ -181,8 +203,12 @@ async def forest_alchemy(callback: CallbackQuery):
     await callback.message.edit_text(
         text=globals()[f"alchemy_{alchemy_lvl}"],
         parse_mode="HTML",
-        reply_markup=create_inline_kb(5, 'forest_alchemy_1', 'forest_alchemy_2', 'forest_alchemy_3', 'forest_alchemy_4',
-                                      'forest_alchemy_5', go_exit="start_forest",
+        reply_markup=create_inline_kb(5, 'forest_alchemy_1',
+                                      'forest_alchemy_2',
+                                      'forest_alchemy_3',
+                                      'forest_alchemy_4',
+                                      'forest_alchemy_5',
+                                      go_exit="start_forest",
                                       ))
 
 
@@ -195,10 +221,15 @@ async def get_boss_info(callback: CallbackQuery):
     for boss_id, boss_info in bosses.items():
         if boss_info['level'] == boss_level and boss_info['location'] == boss_location:
             matching_bosses[boss_id] = boss_info['name']
-    await callback.message.edit_text(
-        text=f"Список возможных боссов для\n{FOREST_BTN[callback.data]}:\n\n",
-        reply_markup=create_inline_kb(
-            2, go_exit="forest_bosses", **matching_bosses))
+    try:
+        await callback.message.edit_text(
+            text=f"Список возможных боссов для\n{FOREST_BTN[callback.data]}:\n\n",
+            reply_markup=create_inline_kb(
+                2, go_exit="forest_bosses", **matching_bosses))
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        print(f"Неопознананя ошибка: {e}")
 
 
 @router.callback_query(lambda callback: callback.data.startswith('boss_'))
@@ -207,10 +238,15 @@ async def get_boss_info(callback: CallbackQuery):
     boss_location = callback.data.split('_')[-1]
     boss_level = int(callback.data.split('_')[-2])
     log(callback, f"{bosses[boss]['name']}")
-    await callback.message.edit_text(
-        text=f"{bosses[boss]['text']}",
-        reply_markup=create_inline_kb(
-            1, go_exit=f"dungeon_{boss_level}_{boss_location}"))
+    try:
+        await callback.message.edit_text(
+            text=f"{bosses[boss]['text']}",
+            reply_markup=create_inline_kb(
+                1, go_exit=f"dungeon_{boss_level}_{boss_location}"))
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        print(f"Неопознананя ошибка: {e}")
 
 
 @router.callback_query(Text(text='forest_bosses'))
@@ -222,16 +258,25 @@ async def process_start_command(callback_or_message: CallbackQuery | Message):
         user = f"{users_db[str(callback_or_message.from_user.id)]['icon']}" \
                f"{users_db[str(callback_or_message.from_user.id)]['game_name']}"
 
-    keyboard = create_inline_kb(2, 'dungeon_1_S', 'dungeon_1_N', 'dungeon_2_S', 'dungeon_2_N', 'dungeon_3_S',
-                                'dungeon_3_N', 'dungeon_4_S', 'dungeon_4_N', 'dungeon_5_S', 'dungeon_5_N',
+    keyboard = create_inline_kb(3,
+                                'dungeon_1_S', 'dungeon_1_N', 'dungeon_1_D',
+                                'dungeon_2_S', 'dungeon_2_N', 'dungeon_2_D',
+                                'dungeon_3_S', 'dungeon_3_N', 'dungeon_3_D',
+                                'dungeon_4_S', 'dungeon_4_N', 'dungeon_4_D',
+                                'dungeon_5_S', 'dungeon_5_N', 'dungeon_5_D',
                                 go_exit="start_forest",
                                 )
     if isinstance(callback_or_message, CallbackQuery):
-        await callback_or_message.message.edit_text(
-            text=FOREST_LEXICON['choice_dungeon_location'].format(user),
-            parse_mode="HTML",
-            reply_markup=keyboard
-        )
+        try:
+            await callback_or_message.message.edit_text(
+                text=FOREST_LEXICON['choice_dungeon_location'].format(user),
+                parse_mode="HTML",
+                reply_markup=keyboard
+            )
+        except TelegramNetworkError as e:
+            print(f"Ошибка сети Telegram: {e.message}")
+        except Exception as e:
+            print(f"Неопознананя ошибка: {e}")
     else:
         await callback_or_message.answer(
             text=FOREST_LEXICON['choice_dungeon_location'].format(user),
@@ -264,12 +309,13 @@ async def process_get_statistic(callback_or_message: CallbackQuery | Message):
 
     users_old = load_log_file(f"logs_forest/{clan_name}/{logs_list[-data_int]}")
     all_users: dict = create_progress(users, users_old)
-    ctime_last = datetime.fromtimestamp(getctime(f"logs_forest/{clan_name}/{logs_list[-1]}")).strftime('%d.%m (%H:%M)')
+    ctime_last = datetime.fromtimestamp(getctime(f"logs_forest/{clan_name}/{logs_list[-1]}")).strftime(
+        '%d.%m.%y (%H:%M)')
     ctime_data = datetime.fromtimestamp(getctime(f"logs_forest/{clan_name}/{logs_list[-data_int]}")).strftime(
-        '%d.%m (%H:%M)')
+        '%d.%m.%y (%H:%M)')
     # Преобразуем строки обратно в объекты datetime
-    datetime_last = datetime.strptime(ctime_last, '%d.%m (%H:%M)')
-    datetime_data = datetime.strptime(ctime_data, '%d.%m (%H:%M)')
+    datetime_last = datetime.strptime(ctime_last, '%d.%m.%y (%H:%M)')
+    datetime_data = datetime.strptime(ctime_data, '%d.%m.%y (%H:%M)')
 
     # Вычисляем разницу во времени
     time_difference = datetime_last - datetime_data
@@ -290,11 +336,19 @@ async def process_get_statistic(callback_or_message: CallbackQuery | Message):
     answer += f"\n\n📈Общий прогресс за ~{hours_difference} ч. <b>+{all_exp_gain:,}</b>⚜\n⚙️Фильтр: по приросту"
     buttons: dict = {f"clan_{clan_name}_{data_int - 1 or 2}": "⬅️", f"clan_{clan_name}_{data_int + 1}": "➡️"}
     if isinstance(callback_or_message, CallbackQuery):
-        await callback_or_message.message.edit_text(
-            text=answer,
-            parse_mode="HTML",
-            disable_web_page_preview=True,
-            reply_markup=create_inline_kb(2, go_exit="clan_statistic", **buttons))
+        try:
+            await callback_or_message.message.edit_text(
+                text=answer,
+                parse_mode="HTML",
+                disable_web_page_preview=True,
+                reply_markup=create_inline_kb(2, go_exit="clan_statistic", **buttons))
+        except TelegramNetworkError as e:
+            print(f"Ошибка сети Telegram: {e.message}")
+        except Exception as e:
+            if str(e) == "Telegram server says Request timeout error":
+                print(f"Произошла ошибка: {str(e)}")
+            else:
+                print(f"Неопознананя ошибка: {e}")
     else:
         await callback_or_message.answer(
             text=answer,
@@ -312,14 +366,14 @@ async def process_start_command(callback_or_message: CallbackQuery | Message):
         user = f"{users_db[str(callback_or_message.from_user.id)]['icon']}" \
                f"{users_db[str(callback_or_message.from_user.id)]['game_name']}"
     buttons: dict = {
-        "key_1_S": FOREST_BTN['key_1_S'], "key_1_N": FOREST_BTN['key_1_N'],
-        "key_2_S": FOREST_BTN['key_2_S'], "key_2_N": FOREST_BTN['key_2_N'],
-        "key_3_S": FOREST_BTN['key_3_S'], "key_3_N": FOREST_BTN['key_3_N'],
-        "key_4_S": FOREST_BTN['key_4_S'], "key_4_N": FOREST_BTN['key_4_N'],
-        "key_5_S": FOREST_BTN['key_5_S'], "key_5_N": FOREST_BTN['key_5_N'],
+        "key_1_S": FOREST_BTN['key_1_S'], "key_1_N": FOREST_BTN['key_1_N'], "key_1_D": FOREST_BTN['key_1_D'],
+        "key_2_S": FOREST_BTN['key_2_S'], "key_2_N": FOREST_BTN['key_2_N'], "key_2_D": FOREST_BTN['key_2_D'],
+        "key_3_S": FOREST_BTN['key_3_S'], "key_3_N": FOREST_BTN['key_3_N'], "key_3_D": FOREST_BTN['key_3_D'],
+        "key_4_S": FOREST_BTN['key_4_S'], "key_4_N": FOREST_BTN['key_4_N'], "key_4_D": FOREST_BTN['key_4_D'],
+        "key_5_S": FOREST_BTN['key_5_S'], "key_5_N": FOREST_BTN['key_5_N'], "key_5_D": FOREST_BTN['key_5_D'],
     }
     keyboard = create_inline_kb(
-        2, go_exit="start_forest", **buttons
+        3, go_exit="start_forest", **buttons
     )
     msg_params: dict = {
         "text": FOREST_LEXICON['choice_dungeon_key'].format(user),
@@ -327,10 +381,18 @@ async def process_start_command(callback_or_message: CallbackQuery | Message):
         "disable_web_page_preview": True,
         "reply_markup": keyboard
     }
-    if isinstance(callback_or_message, CallbackQuery):
-        await callback_or_message.message.edit_text(**msg_params)
-    else:
-        await callback_or_message.answer(**msg_params)
+    try:
+        if isinstance(callback_or_message, CallbackQuery):
+            await callback_or_message.message.edit_text(**msg_params)
+        else:
+            await callback_or_message.answer(**msg_params)
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        if str(e) == "Telegram server says Request timeout error":
+            print(f"Произошла ошибка: {str(e)}")
+        else:
+            print(f"Неопознананя ошибка: {e}")
 
 
 @router.callback_query(lambda callback: callback.data.startswith('key_'))
@@ -352,3 +414,78 @@ async def process_start_command(callback: CallbackQuery):
         reply_markup=create_inline_kb(
             1, go_exit="start_forest",
         ))
+
+
+@router.callback_query(lambda callback: callback.data.startswith('recipe_'))
+async def get_recipe_info(callback: CallbackQuery):
+    recipe_type = callback.data.split('_')[-1]
+
+    matching_recipe = {}
+    for recipe in forest_berries:
+        if recipe.split('_')[-2] == recipe_type:
+            matching_recipe[recipe] = forest_berries[recipe]['berries_text'][:5] + \
+                                      forest_berries[recipe]['berries_text'][
+                                      13:forest_berries[recipe]['berries_text'].index('\n')].capitalize()
+
+    try:
+        await callback.message.edit_text(
+            text=f"Рецепты для пирожков из {FOREST_BTN[callback.data]}:\n\n",
+            reply_markup=create_inline_kb(
+                1, go_exit="forest_berries", **matching_recipe))
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        print(f"Неопознананя ошибка: {e}")
+
+
+@router.callback_query(lambda callback: callback.data.startswith('berries_'))
+async def get_berries_info(callback: CallbackQuery):
+    berry = callback.data
+    # berry_count = callback.data.split('_')[-1]
+    berry_type = int(callback.data.split('_')[-2])
+    log(callback, forest_berries[berry]['berries_text'][:forest_berries[berry]['berries_text'].index('\n')])
+    try:
+        await callback.message.edit_text(
+            text=f"{forest_berries[berry]['berries_text']}",
+            reply_markup=create_inline_kb(
+                1, go_exit=f"recipe_{berry_type}"))
+    except TelegramNetworkError as e:
+        print(f"Ошибка сети Telegram: {e.message}")
+    except Exception as e:
+        print(f"Неопознананя ошибка: {e}")
+
+
+@router.callback_query(Text(text='forest_berries'))
+@router.message(Command('berries'))
+async def berries_start_command(callback_or_message: CallbackQuery | Message):
+    user = callback_or_message.from_user.first_name
+    users_db = load_log_file("database/users_db.json")
+    if str(callback_or_message.from_user.id) in users_db:
+        user = f"{users_db[str(callback_or_message.from_user.id)]['icon']}" \
+               f"{users_db[str(callback_or_message.from_user.id)]['game_name']}"
+
+    keyboard = create_inline_kb(4,
+                                'recipe_3', 'recipe_4', 'recipe_5', 'recipe_6',
+                                go_exit="start_forest",
+                                )
+    if isinstance(callback_or_message, CallbackQuery):
+        try:
+            await callback_or_message.message.edit_text(
+                text=FOREST_LEXICON['choice_berries_recipe'].format(user),
+                parse_mode="HTML",
+                reply_markup=keyboard
+            )
+        except TelegramNetworkError as e:
+            print(f"Ошибка сети Telegram: {e.message}")
+        except Exception as e:
+            print(f"Неопознананя ошибка: {e}")
+    else:
+        try:
+            await callback_or_message.answer(
+                text=FOREST_LEXICON['choice_berries_recipe'].format(user),
+                parse_mode="HTML",
+                reply_markup=keyboard)
+        except TelegramNetworkError as e:
+            print(f"Ошибка сети Telegram: {e.message}")
+        except Exception as e:
+            print(f"Неопознананя ошибка: {e}")
